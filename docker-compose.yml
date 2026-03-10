@@ -1,0 +1,39 @@
+services:
+  logistics_base: # сервис для базы данных Postgres
+    image: postgres:15-alpine # alpine версия еще легче
+    volumes:
+      - logistics_pg_volume:/var/lib/postgresql/data/ # Сохранение данных БД
+    env_file:
+      - .env
+    networks: # включаем сервис в единую докер-сеть
+      - logistics_network
+    # Добавляем проверку здоровья (healthcheck) для PostgreSQL
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s # Проверять каждые 10 секунд
+      timeout: 5s   # Ждать ответа 5 секунд
+      retries: 5    # После 5 неудач пометить как unhealthy
+      start_period: 10s # Дать базе 10 секунд на "раскачку" перед первой проверкой
+
+  logistics_backend: # сервис бэкенда
+    build:
+      context: . # Docker автоматически ищет файл с именем Dockerfile в текущем контексте
+    env_file:
+      - .env
+    volumes: # 1. Монтируем текущую папку хоста в папку приложения в контейнере
+      - .:/app # WORKDIR, который указан в вашем Dockerfile
+    # Переопределяем команду запуска, добавляя --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on: #pfgecr бэкенда зависит от хорошего состаяния БД
+      logistics_base:
+        condition: service_healthy
+    networks: # включаем сервис в единую докер-сеть
+      - logistics_network
+
+# эти блоки должны быть на уровне сервисов!!!
+networks: # прописываем сразу докер-сеть в которой будут работать сервисы
+  logistics_network:
+    driver: bridge
+  
+volumes: # прописываем запуск тома для БД
+  logistics_pg_volume:
