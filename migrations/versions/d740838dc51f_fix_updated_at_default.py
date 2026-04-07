@@ -1,8 +1,8 @@
-"""First migration
+"""fix_updated_at_default
 
-Revision ID: b962fee5c842
+Revision ID: d740838dc51f
 Revises: 
-Create Date: 2026-03-13 14:27:53.604850
+Create Date: 2026-04-06 22:31:32.575482
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'b962fee5c842'
+revision: str = 'd740838dc51f'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,7 +28,7 @@ def upgrade() -> None:
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('company_inn'),
     sa.UniqueConstraint('company_name')
@@ -38,7 +38,7 @@ def upgrade() -> None:
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('pallet_type')
     )
@@ -50,7 +50,7 @@ def upgrade() -> None:
     sa.Column('carrier_id', sa.UUID(), nullable=False),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['carrier_id'], ['companys.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('driver_licence_document')
@@ -61,7 +61,7 @@ def upgrade() -> None:
     sa.Column('company_id', sa.UUID(), nullable=False),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['company_id'], ['companys.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -76,7 +76,7 @@ def upgrade() -> None:
     sa.Column('company_id', sa.UUID(), nullable=True),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['company_id'], ['companys.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
@@ -90,7 +90,7 @@ def upgrade() -> None:
     sa.Column('carrier_id', sa.UUID(), nullable=False),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['carrier_id'], ['companys.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('vehicle_number')
@@ -115,7 +115,7 @@ def upgrade() -> None:
     sa.Column('delivery_location_id', sa.UUID(), nullable=True),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['creator_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['customer_id'], ['companys.id'], ),
     sa.ForeignKeyConstraint(['delivery_location_id'], ['locations.id'], ),
@@ -132,7 +132,7 @@ def upgrade() -> None:
     sa.Column('bid_creator_id', sa.UUID(), nullable=False),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['bid_creator_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['carrier_id'], ['companys.id'], ),
     sa.ForeignKeyConstraint(['trade_id'], ['trades.id'], ),
@@ -145,7 +145,7 @@ def upgrade() -> None:
     sa.Column('files_urls', sa.JSON(), nullable=True),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['driver_id'], ['drivers.id'], ),
     sa.ForeignKeyConstraint(['vehicle_id'], ['vehicles.id'], ),
     sa.ForeignKeyConstraint(['won_bid_id'], ['bids.id'], ),

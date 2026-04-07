@@ -38,4 +38,10 @@ class Base(DeclarativeBase):
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(onupdate=func.now())
+
+    updated_at: Mapped[datetime] = mapped_column(
+        #  Даст время при СОЗДАНИИ
+        server_default=func.now(),
+        # Даст новое время при ОБНОВЕ
+        onupdate=func.now()
+    )

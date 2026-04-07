@@ -49,7 +49,7 @@ fi
 
 # Создаем начальные данные (админа)
 echo "if necessary creating initial data..."
-python app/initial_data.py
+python -m app.initial_data
 
 # Запускаем основное приложение (команду, которая была в Dockerfile)
 echo "Starting backend..."
