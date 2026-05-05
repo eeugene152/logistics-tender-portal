@@ -1,5 +1,5 @@
 import os
-
+from typing import Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL
 
@@ -41,6 +41,14 @@ class Settings(BaseSettings):
         # app/alembic/env.py ждет именно строку
         # hide_password=False важен, иначе пароль заменится на ***
         return url_obj.render_as_string(hide_password=False)
+
+    # Режим работы: 'DEV' или 'PROD'
+    MODE: Literal["DEV", "PROD"] = "DEV"
+
+    @property
+    def COOKIE_SECURE(self) -> bool:
+        # Если мы в PROD — True, если в DEV — False
+        return self.MODE == "PROD"
 
 
 # Создаем экземпляр, который будем импортировать в другие файлы

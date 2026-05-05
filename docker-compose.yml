@@ -17,6 +17,7 @@ services:
     ports:
       - "5432:5432" # Это связывает порт контейнера с твоим Windows
 
+
   logistics_backend: # сервис бэкенда
     build:
       context: . # Docker автоматически ищет файл с именем Dockerfile в текущем контексте
@@ -31,6 +32,8 @@ services:
         condition: service_healthy
     networks: # включаем сервис в единую докер-сеть
       - logistics_network
+    ports:
+      - "8000:8000" # Это связывает порт контейнера с твоим Windows
 
 # эти блоки должны быть на уровне сервисов!!!
 networks: # прописываем сразу докер-сеть в которой будут работать сервисы

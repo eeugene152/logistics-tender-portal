@@ -10,7 +10,7 @@ from app.core.config import settings
 from app.core.session import async_session_maker
 from app.models.users import User
 from app.models.enums import UserType
-from app.core.security import get_password_hash
+from app.core.hashing import get_password_hash
 
 
 async def create_first_superuser():
