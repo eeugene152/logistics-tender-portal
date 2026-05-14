@@ -5,6 +5,8 @@ from app.core.session import get_async_session
 from jose import jwt, JWTError
 from app.core.config import settings
 from app.crud.user import user_crud
+from uuid import UUID
+from app.models.users import User
 
 
 # Указываем, где FastAPI искать токен (в заголовке Authorization)
@@ -66,4 +68,17 @@ async def get_current_user(
             detail='Пользователь не найден'
         )
 
+    return user
+
+
+async def get_user_by_id_or_404(
+    user_id: UUID,
+    session: AsyncSession = Depends(get_async_session)
+) -> User:
+    user = await user_crud.find_one_or_none(session=session, id=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Пользователь с таким ID не найден.'
+        )
     return user

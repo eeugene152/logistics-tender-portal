@@ -6,7 +6,7 @@ from app.schemas.auth import SchemaUserRegister, SchemaUserUpdate, SchemaUserCre
 from app.core.hashing import get_password_hash
 
 
-class CRUDUser(CRUDBase[User, SchemaUserCreate]):
+class CRUDUser(CRUDBase[User, SchemaUserCreate, SchemaUserUpdate]):
     # Переопределяем стандартный метод create
     # т.к. нужно поменять поля с паролями (обычный-хешированный)
     async def create(

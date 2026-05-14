@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Annotated
 
 from pydantic import Field
-from sqlalchemy import UUID
+from sqlalchemy import UUID, Boolean
 from sqlalchemy.orm import (
   DeclarativeBase, Mapped, mapped_column, declared_attr
 )
@@ -44,4 +44,7 @@ class Base(DeclarativeBase):
         server_default=func.now(),
         # Даст новое время при ОБНОВЕ
         onupdate=func.now()
+    )
+    archieved: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default='false'
     )

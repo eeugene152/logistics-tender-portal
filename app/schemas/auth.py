@@ -1,4 +1,4 @@
-from pydantic import Field, BaseModel, EmailStr
+from pydantic import Field, BaseModel, EmailStr, ConfigDict
 from uuid import UUID
 from typing import Optional
 
@@ -28,19 +28,33 @@ class SchemaUserBase(BaseModel):
 # То, что присылает фронтенд при регистрации
 class SchemaUserRegister(SchemaUserBase):
     password: str = Field(..., min_length=8)
+    # Принимаем данные, запрещаем лишнее
+    model_config = ConfigDict(extra='forbid')
 
 
 class SchemaUserCreate(SchemaUserBase):
-    hashed_password: str  # = Field(..., min_length=8)
+    hashed_password: str
+    # Принимаем данные, запрещаем лишнее
+    model_config = ConfigDict(extra='forbid')
 
 
 class SchemaUserRead(SchemaUserBase):
     id: UUID
-
-    class Config:
-        from_attributes = True # Позволяет Pydantic работать с моделями SQLAlchemy
+    # Читаем из базы, поэтому разрешаем атрибуты
+    model_config = ConfigDict(from_attributes=True)
+    # Позволяет Pydantic работать с моделями SQLAlchemy
         # нужен только там, где ты возвращаешь данные из базы.
 
 
 class SchemaUserUpdate(SchemaUserBase):
-    pass
+    email: Optional[EmailStr]
+    first_name: Optional[str]
+    last_name: Optional[str]
+    role: Optional[str]
+    phone_num: Optional[str]
+    # Принимаем данные, запрещаем лишнее
+    model_config = ConfigDict(extra='forbid')
+
+
+class SchemaUserArchieve(SchemaUserRead):
+    archieved: bool
