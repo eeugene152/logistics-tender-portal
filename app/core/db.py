@@ -20,7 +20,7 @@ str_null_false = Annotated[
     str, Field(max_length=255), mapped_column(nullable=False)
 ]
 inn_str = Annotated[str, Field(
-    min_length=12, max_length=12
+    min_length=10, max_length=12
 ), mapped_column(unique=True, nullable=False)
 ]
 float_two_digits = Annotated[

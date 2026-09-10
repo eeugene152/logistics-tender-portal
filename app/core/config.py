@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL
@@ -6,6 +7,9 @@ from sqlalchemy.engine import URL
 ROOT_DIR_ENV = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "..", "..", ".env"
 )
+
+# Находим корень проекта (где лежит папка app)
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
@@ -19,6 +23,9 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     FIRST_SUPERUSER_EMAIL: str
     FIRST_SUPERUSER_PASSWORD: str
+
+    # Путь к папке с сидами. По умолчанию: корень_проекта / app / seeds
+    SEEDS_DIR: str = os.path.join(BASE_DIR, "app", "seeds")
 
     model_config = SettingsConfigDict(
         env_file=ROOT_DIR_ENV,

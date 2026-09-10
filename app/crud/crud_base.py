@@ -4,7 +4,8 @@ from typing import TypeVar, Generic, Type, Optional, Any, List, Union
 from pydantic import BaseModel
 
 
-# Объявляем переменные для типов, чтобы CRUD понимал, с какой моделью и схемой работает
+# Объявляем переменные для типов, чтобы CRUD понимал, с какой
+# моделью и схемой работает
 ModelType = TypeVar('ModelType')
 CreateSchemaType = TypeVar('CreateSchemaType', bound=BaseModel)
 UpdateSchemaType = TypeVar('UpdateSchemaType', bound=BaseModel)
@@ -65,8 +66,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             self,
             session: AsyncSession,
             *,
-            db_obj: ModelType,  # Живой объект из базы (например, User)
-            obj_in: Union[UpdateSchemaType, dict]  # Схема обновления (UserUpdate) ИЛИ обычный словарь
+            # Живой объект из базы (например, User)
+            db_obj: ModelType,
+            # Схема обновления (UserUpdate) ИЛИ обычный словарь
+            obj_in: Union[UpdateSchemaType, dict]
     ) -> ModelType:  # Метод возвращает обновленную модель
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -95,4 +98,3 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             await session.commit()
             await session.refresh(db_obj)
             return db_obj
-

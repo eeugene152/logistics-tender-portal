@@ -37,23 +37,11 @@ while ! pg_isready -h "$HOST" -p "$PORT" -U "$POSTGRES_USER" > /dev/null 2>&1; d
 done
 echo "PostgreSQL is UP - proceeding with migrations."
 
-
-MIGRATIONS_DIR="/app/migrations/versions"
-
-# Проверяем, если папка версий пустая ИЛИ мы принудительно сбросили базу (считаем по файлам)
-# Мы просто берем и ОЧИЩАЕМ папку от старых файлов перед генерацией, 
-# чтобы у Алембика была кристально чистая история
-echo "Cleaning up old migration files to prevent conflicts..."
-rm -rf "$MIGRATIONS_DIR"/*
-rm -rf "$MIGRATIONS_DIR"/.pytest_cache
-rm -rf "$MIGRATIONS_DIR"/__pycache__
-
-echo "Generating fresh initial migration..."
-if alembic revision --autogenerate -m "initial_schema"; then
-    echo "Initial migration generated successfully!"
-else
-    echo "ERROR: Failed to generate migration!"
-    exit 1
+# Проверяем, есть ли файлы миграций в папке.
+# Если папка пустая (или там только __init__.py), создаем начальную миграцию автоматически
+if [ -z "$(ls -A /app/app/migrations/versions 2>/dev/null)" ] || [ "$(ls -A /app/app/migrations/versions)" = "__init__.py" ]; then
+    echo "No migrations found. Generating initial migration..."
+    alembic revision --autogenerate -m "initial_schema"
 fi
 
 # Применяем миграции

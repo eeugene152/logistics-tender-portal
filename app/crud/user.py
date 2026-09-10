@@ -1,8 +1,11 @@
 from app.models import User
 from app.crud.crud_base import CRUDBase
-from app.schemas.auth import SchemaUserCreate
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.auth import SchemaUserRegister, SchemaUserUpdate, SchemaUserCreate
+from app.schemas.auth import (
+  SchemaUserRegister,
+  SchemaUserUpdate,
+  SchemaUserCreate
+)
 from app.core.hashing import get_password_hash
 
 

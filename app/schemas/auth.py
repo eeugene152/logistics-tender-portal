@@ -43,7 +43,7 @@ class SchemaUserRead(SchemaUserBase):
     # Читаем из базы, поэтому разрешаем атрибуты
     model_config = ConfigDict(from_attributes=True)
     # Позволяет Pydantic работать с моделями SQLAlchemy
-        # нужен только там, где ты возвращаешь данные из базы.
+    # нужен только там, где ты возвращаешь данные из базы.
 
 
 class SchemaUserUpdate(SchemaUserBase):

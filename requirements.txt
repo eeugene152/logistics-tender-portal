@@ -34,3 +34,6 @@ python-jose[cryptography]
 
 # для валидации в pydantic-схемах имейла
 pydantic[email]
+
+# библиотека чтобы подружить питон и эксель
+openpyxl>=3.1.0
