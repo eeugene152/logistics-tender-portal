@@ -24,6 +24,7 @@
 # app/core/seeder.py
 import json
 import os
+from io import BytesIO
 from typing import Any, Dict, List
 from openpyxl import load_workbook
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,6 +33,29 @@ from app.core.config import settings
 
 
 class UniversalDataSeeder:
+    @classmethod
+    def parse_memory_file(
+        cls, file_bytes: bytes, filename: str
+    ) -> list[dict[str, Any]]:
+        """
+        Парсит файл, загруженный в оперативную память.
+        (без сохранения на диск)
+        """
+        _, ext = os.path.splitext(filename)
+        ext = ext.lower()
+
+        if ext == '.json':
+            return json.loads(file_bytes.decode('utf-8'))
+        elif ext == '.xlsx':
+            # Заворачиваем байты в поток BytesIO,
+            # чтобы openpyxl мог его прочитать
+            return cls._parse_excel(BytesIO(file_bytes))
+
+        raise ValueError(
+            'Неподдерживаемый формат файла. '
+            'Разрешены только .json и .xlsx'
+        )
+
     @staticmethod
     def _parse_excel(stream: Any) -> List[Dict[str, Any]]:
         wb = load_workbook(stream, data_only=True)
@@ -63,6 +87,66 @@ class UniversalDataSeeder:
             with open(file_path, 'rb') as f:
                 return cls._parse_excel(f)
         return []
+
+    @classmethod
+    async def seed_memory_data(
+        cls,
+        session: AsyncSession,
+        file_bytes: bytes,
+        filename: str,
+        entity_config: dict[str, Any]
+    ) -> dict[str, Any]:
+        """
+        Универсальный движок для импорта данных из памяти.
+        Принимает байты файла, имя файла и конфигурацию сущности из реестра.
+        """
+        # Парсим файл в список словарей
+        raw_data = cls.parse_memory_file(file_bytes, filename)
+
+        if not raw_data:
+            return {
+                'status': 'skipped',
+                'created': 0,
+                'skipped_duplicates': 0,
+                'errors': ['Файл пуст']
+            }
+
+        created_count = 0
+        skipped_count = 0
+        errors = []
+
+        crud = entity_config['crud']
+        schema = entity_config['schema']
+        unique_field = entity_config['unique_field']
+
+        # Бежим по строкам точно так же, как в автоматическом сидере
+        for index, item in enumerate(raw_data, start=1):
+            try:
+                unique_value = item.get(
+                    unique_field
+                ) or item.get('inn') or item.get('email')
+
+                if unique_value is not None:
+                    unique_value = str(unique_value).strip()
+                    filters = {unique_field: unique_value}
+                    exists = await crud.find_one_or_none(session, **filters)
+                    if exists:
+                        skipped_count += 1
+                        continue
+
+                validated_obj = schema(**item)
+                await crud.create(session, obj_in=validated_obj)
+                created_count += 1
+
+            except Exception as error_message:
+                errors.append(f'Строка {index}: {str(error_message)}')
+
+        return {
+            'status': 'success' if not errors else 'partial_success',
+            'imported_new_records': created_count,
+            'skipped_duplicates': skipped_count,
+            'errors': errors
+        }
 
     @classmethod
     async def seed_all(cls, session: AsyncSession) -> None:
